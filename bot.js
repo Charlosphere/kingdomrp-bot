@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const moment = require('moment');
+const database = require('./database');
 
 const token = process.env.KINGDOMRP_TOKEN;
 const bot = new Discord.Client();
@@ -7,6 +8,7 @@ const timestamp = () => moment(new Date).format('HH:mm:ss');
 
 bot.on('ready', () => {
   console.log(`Logged in as ${bot.user.username} at [${timestamp()}]!`);
+  database.init();
 });
 
 // Messages listener
