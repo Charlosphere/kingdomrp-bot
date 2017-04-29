@@ -26,8 +26,11 @@ bot.on('message', msg => {
   // #### PUBLIC COMMANDS ####
 
   // Help command
-  if (msg.content.startsWith(`${config.trigger}help`)) {
-    msg.reply('Here are my commands.');
+   if (msg.content === `${config.trigger}help`) {
+    msg.reply('I\'m here to help! Here are my commands.\n\n' + 
+    '`$help` : Show all available commands.\n\n' + 
+    '`$balance @user` : Show the current balance of the mentionned user.\n\n' + 
+    '`$give @user [amount]` : Give the amount specified to the mentionned user.');
   }
 
   // Give gold command
