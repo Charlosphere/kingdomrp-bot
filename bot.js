@@ -35,28 +35,39 @@ bot.on('message', msg => {
 
   // Give gold command
   else if (msg.content.startsWith(`${config.trigger}give`)) {
-    if (msg.mentions.users.first() !== undefined) {
-      let match = /\s\d+/.exec(msg.content); // regex: contains a number with whitespace before
-      if (match !== null) {
-        database.getGold(msg.author.id, (err, row) => {
-          if (row.gold >= parseInt(match[0])) {
-            database.updateGold(msg.author.id, row.gold - parseInt(match[0]));
-            database.getGold(msg.mentions.users.first().id, (err, row) => {
-              database.updateGold(msg.mentions.users.first().id, row.gold + parseInt(match[0]));
-              msg.reply(`You transferred ${parseInt(match[0])} ${emoji.get('dollar')} to ${msg.mentions.users.first().username} from your account.`);
-            });
-          }
-          else {
-            msg.reply(`You don\'t have enough ${emoji.get('dollar')} for this transaction.`);
-          }
-        });
+
+    if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
+
+      if (msg.mentions.users.first().id !== msg.author.id) {
+
+        let match = /\s\d+/.exec(msg.content); // regex: contains a number with whitespace before
+        if (match !== null) {
+
+          database.getGold(msg.author.id, (err, row) => {
+            if (row.gold >= parseInt(match[0])) {
+              database.updateGold(msg.author.id, row.gold - parseInt(match[0]));
+              database.getGold(msg.mentions.users.first().id, (err, row) => {
+                database.updateGold(msg.mentions.users.first().id, row.gold + parseInt(match[0]));
+                msg.reply(`You transferred ${parseInt(match[0])} ${emoji.get('dollar')} to ${msg.mentions.users.first().username} from your account.`);
+              });
+            }
+
+            else {
+              msg.reply(`You don\'t have enough ${emoji.get('dollar')} for this transaction.`);
+            }
+          });
+        }
+      }
+
+      else {
+        msg.reply('This is not how things work, unfortunately...');
       }
     }
   }
 
   // Show gold command
   if (msg.content.startsWith(`${config.trigger}balance`)) {
-    if (msg.mentions.users.first() !== undefined) {
+    if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
       database.getGold(msg.mentions.users.first().id, (err, row) => {
         msg.reply(`${msg.mentions.users.first().username} has ${row.gold} ${emoji.get('dollar')} in his account.`);
       });
@@ -72,7 +83,7 @@ bot.on('message', msg => {
 
   // Super-user give: magically give gold to any player
   else if (msg.content.startsWith(`${config.trigger}sugive`)) {
-    if (msg.mentions.users.first() !== undefined) {
+    if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
       let match = /\s\d+/.exec(msg.content); // regex: contains a number with whitespace before
       if (match !== null) {
         database.getPromotion(msg.author.id, (err, row) => {
@@ -89,7 +100,7 @@ bot.on('message', msg => {
 
   // Reset user: set gold to 0 (eventually reset inventory as well)
   else if (msg.content.startsWith(`${config.trigger}reset`)) {
-    if (msg.mentions.users.first() !== undefined) {
+    if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
       database.getPromotion(msg.author.id, (err, row) => {
         if (row.admin === 1 || row.suadmin === 1) {
           database.updateGold(msg.mentions.users.first().id, 0);
@@ -103,7 +114,7 @@ bot.on('message', msg => {
 
   // Promote user: Add as admin
   else if (msg.content.startsWith(`${config.trigger}promote`)) {
-    if (msg.mentions.users.first() !== undefined) {
+    if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
       database.getPromotion(msg.author.id, (err, row) => {
         if (row.suadmin === 1) {
           database.getPromotion(msg.mentions.users.first().id, (err, row) => {
@@ -122,7 +133,7 @@ bot.on('message', msg => {
 
   // Demote user: Remove from admins
   else if (msg.content.startsWith(`${config.trigger}demote`)) {
-    if (msg.mentions.users.first() !== undefined) {
+    if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
       database.getPromotion(msg.author.id, (err, row) => {
         if (row.suadmin === 1) {
           database.getPromotion(msg.mentions.users.first().id, (err, row) => {

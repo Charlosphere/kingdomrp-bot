@@ -47,7 +47,7 @@ exports.addAllUsers = channels => {
   })
 };
 
-exports.removeUser = (id) => {
+exports.removeUser = id => {
   db.run('DELETE FROM user WHERE id = ?;', id);
 };
 
