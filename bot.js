@@ -51,6 +51,20 @@ bot.on('message', msg => {
     }
   }
 
+  // Show gold command
+  if (msg.content.startsWith(`${config.trigger}balance`)) {
+    if (msg.mentions.users.first() !== undefined) {
+      database.getGold(msg.mentions.users.first().id, (err, row) => {
+        msg.reply(`${msg.mentions.users.first().username} has ${row.gold} ${emoji.get('dollar')} in his account.`);
+      });
+    }
+    else {
+      database.getGold(msg.author.id, (err, row) => {
+        msg.reply(`You currently have ${row.gold} ${emoji.get('dollar')} in your account.`);
+      });
+    }
+  }
+
   // #### ADMIN COMMANDS ####
 
   // Super-user give: magically give gold to any player
@@ -76,7 +90,7 @@ bot.on('message', msg => {
       database.getPromotion(msg.author.id, (err, row) => {
         if (row.admin === 1 || row.suadmin === 1) {
           database.updateGold(msg.mentions.users.first().id, 0);
-          msg.reply(`You reset ${msg.mentions.users.first().username}. Its balance is at 0 ${emoji.get('dollar')}.`);
+          msg.reply(`You reset ${msg.mentions.users.first().username}. His balance is at 0 ${emoji.get('dollar')}.`);
         }
       });
     }
