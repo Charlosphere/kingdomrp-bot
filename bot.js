@@ -35,37 +35,39 @@ bot.on('message', msg => {
     msg.reply('Here are my commands.');
   }
 
+
+
   // ########################
 
   // #### ADMIN COMMANDS ####
 
   // Super-user give: magically give gold to any player
   else if (msg.content.startsWith(`${config.trigger}sugive`)) {
-    database.getPromotion(msg.author.id, (err, row) => {
-      if (row.admin === 1 || row.suadmin === 1) {
-        if (msg.mentions.users.first() !== undefined) {
-          let match = /\s\d+/.exec(msg.content); // regex: contains a number with whitespace before
-          if (match !== null) {
+    if (msg.mentions.users.first() !== undefined) {
+      let match = /\s\d+/.exec(msg.content); // regex: contains a number with whitespace before
+      if (match !== null) {
+        database.getPromotion(msg.author.id, (err, row) => {
+          if (row.admin === 1 || row.suadmin === 1) {
             database.getGold(msg.mentions.users.first().id, (err, row) => {
               database.updateGold(msg.mentions.users.first().id, row.gold + parseInt(match[0]))
               msg.reply(`You magically transfered ${parseInt(match[0])} ${emoji.get('dollar')} to ${msg.mentions.users.first().username}.`);
             });
           }
-        }
+        });
       }
-    });
+    }
   }
 
   // Reset user: set gold to 0 (eventually reset inventory as well)
   else if (msg.content.startsWith(`${config.trigger}reset`)) {
-    database.getPromotion(msg.author.id, (err, row) => {
-      if (row.admin === 1 || row.suadmin === 1) {
-        if (msg.mentions.users.first() !== undefined) {
+    if (msg.mentions.users.first() !== undefined) {
+      database.getPromotion(msg.author.id, (err, row) => {
+        if (row.admin === 1 || row.suadmin === 1) {
           database.updateGold(msg.mentions.users.first().id, 0);
-          msg.reply(`You reset ${msg.mentions.users.first().username}. He now has 0 ${emoji.get('dollar')}.`);
+          msg.reply(`You reset ${msg.mentions.users.first().username}. Its balance is at 0 ${emoji.get('dollar')}.`);
         }
-      }
-    });
+      });
+    }
   }
 
   // ########################
@@ -74,9 +76,9 @@ bot.on('message', msg => {
 
   // Promote user: Add as admin
   else if (msg.content.startsWith(`${config.trigger}promote`)) {
-    database.getPromotion(msg.author.id, (err, row) => {
-      if (row.suadmin === 1) {
-        if (msg.mentions.users.first() !== undefined) {
+    if (msg.mentions.users.first() !== undefined) {
+      database.getPromotion(msg.author.id, (err, row) => {
+        if (row.suadmin === 1) {
           database.getPromotion(msg.mentions.users.first().id, (err, row) => {
             if (row.admin === 0) {
               database.promoteUser(msg.mentions.users.first().id, 1);
@@ -87,27 +89,27 @@ bot.on('message', msg => {
             }
           });
         }
-      }
-    });
+      });
+    }
   }
 
   // Demote user: Remove from admins
   else if (msg.content.startsWith(`${config.trigger}demote`)) {
-    database.getPromotion(msg.author.id, (err, row) => {
-      if (row.suadmin === 1) {
-        if (msg.mentions.users.first() !== undefined) {
+    if (msg.mentions.users.first() !== undefined) {
+      database.getPromotion(msg.author.id, (err, row) => {
+        if (row.suadmin === 1) {
           database.getPromotion(msg.mentions.users.first().id, (err, row) => {
             if (row.admin === 1) {
               database.promoteUser(msg.mentions.users.first().id, 0);
-              msg.reply(`You demoted ${msg.mentions.users.first().username}. He no longer is an admin.`)
+              msg.reply(`You demoted ${msg.mentions.users.first().username}.`)
             }
             else {
               msg.reply(`${msg.mentions.users.first().username} is not an admin.`)
             }
           });
         }
-      }
-    });
+      });
+    }
   }
 
 });
