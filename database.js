@@ -1,11 +1,13 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('kingdomrp.db');
  
-exports.init = (channels) => {
+exports.init = channels => {
   db.run('CREATE TABLE IF NOT EXISTS user (' +
          'id VARCHAR(45) PRIMARY KEY,' +
          'username VARCHAR(45) NOT NULL,' +
-         'gold INTEGER NOT NULL);', () => {
+         'gold INTEGER NOT NULL,' +
+         'admin INTEGER NOT NULL,' +
+         'suadmin INTEGER NOT NULL);', () => {
            this.addAllUsers(channels);
          });
 
@@ -19,7 +21,7 @@ exports.init = (channels) => {
          'defense INTEGER NOT NULL,' +
          'roll INTEGER NOT NULL,' +
          'target INTEGER NOT NULL,' +
-         'from_jail BOOLEAN NOT NULL);');
+         'from_jail INTEGER NOT NULL);');
 
   db.run('CREATE TABLE IF NOT EXISTS inventory (' +
          'id INTEGER PRIMARY KEY AUTOINCREMENT,' +
@@ -29,18 +31,38 @@ exports.init = (channels) => {
 
 exports.addUser = (id, username) => {
   db.run('INSERT INTO user (' +
-         'id, username, gold) VALUES (' +
-         '?, ?, 0);', id, username, () => {
+         'id, username, gold, admin, suadmin) VALUES (' +
+         '?, ?, 0, 0, 0);', id, username, () => {
           /* error handling */
         });
 };
 
-exports.addAllUsers = (channels) => {
-  channels.map((channel) => {
-    channel.members.map((member) => {
+exports.addAllUsers = channels => {
+  channels.map(channel => {
+    channel.members.map(member => {
       if (!member.user.bot) {
         this.addUser(member.user.id, member.user.username);
       }
     });
   })
+};
+
+exports.removeUser = (id) => {
+  db.run('DELETE FROM user WHERE id = ?;', id);
+};
+
+exports.promoteUser = (id, value) => {
+  db.run('UPDATE user SET admin = ? WHERE id = ?;', value, id);
+};
+
+exports.getPromotion = (id, callback) => {
+  db.get('SELECT admin, suadmin FROM user WHERE id = ?;', id, callback);
+};
+
+exports.getGold = (id, callback) => {
+  db.get('SELECT gold FROM user WHERE id = ?;', id, callback);
+};
+
+exports.updateGold = (id, gold) => {
+  db.run('UPDATE user SET gold = ? WHERE id = ?;', gold, id);
 };
