@@ -21,10 +21,6 @@ bot.on('guildMemberAdd', member => {
   database.addUser(member.user.id, member.user.username);
 });
 
-bot.on('guildMemberRemove', member => {
-  database.removeUser(member.user.id);
-});
-
 bot.on('message', msg => {
 
   // #### PUBLIC COMMANDS ####
