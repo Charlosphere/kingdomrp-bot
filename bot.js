@@ -27,13 +27,29 @@ bot.on('message', msg => {
 
   // Help command
   if (msg.content.startsWith(`${config.trigger}help`)) {
-    console.log(`[${timestamp()}] ${msg.author.username} used ${config.trigger}help command.`);
     msg.reply('Here are my commands.');
   }
 
-
-
-  // ########################
+  // Give gold command
+  else if (msg.content.startsWith(`${config.trigger}give`)) {
+    if (msg.mentions.users.first() !== undefined) {
+      let match = /\s\d+/.exec(msg.content); // regex: contains a number with whitespace before
+      if (match !== null) {
+        database.getGold(msg.author.id, (err, row) => {
+          if (row.gold >= parseInt(match[0])) {
+            database.updateGold(msg.author.id, row.gold - parseInt(match[0]));
+            database.getGold(msg.mentions.users.first().id, (err, row) => {
+              database.updateGold(msg.mentions.users.first().id, row.gold + parseInt(match[0]));
+              msg.reply(`You transferred ${parseInt(match[0])} ${emoji.get('dollar')} to ${msg.mentions.users.first().username} from your account.`);
+            });
+          }
+          else {
+            msg.reply(`You don\'t have enough ${emoji.get('dollar')} for this transaction.`);
+          }
+        });
+      }
+    }
+  }
 
   // #### ADMIN COMMANDS ####
 
@@ -45,8 +61,8 @@ bot.on('message', msg => {
         database.getPromotion(msg.author.id, (err, row) => {
           if (row.admin === 1 || row.suadmin === 1) {
             database.getGold(msg.mentions.users.first().id, (err, row) => {
-              database.updateGold(msg.mentions.users.first().id, row.gold + parseInt(match[0]))
-              msg.reply(`You magically transfered ${parseInt(match[0])} ${emoji.get('dollar')} to ${msg.mentions.users.first().username}.`);
+              database.updateGold(msg.mentions.users.first().id, row.gold + parseInt(match[0]));
+              msg.reply(`You magically transferred ${parseInt(match[0])} ${emoji.get('dollar')} to ${msg.mentions.users.first().username}.`);
             });
           }
         });
@@ -65,8 +81,6 @@ bot.on('message', msg => {
       });
     }
   }
-
-  // ########################
 
   // #### SUPER-ADMIN COMMANDS ####
 
@@ -107,7 +121,6 @@ bot.on('message', msg => {
       });
     }
   }
-
 });
 
 bot.login(token);
