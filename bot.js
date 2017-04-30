@@ -45,6 +45,7 @@ bot.on('message', msg => {
     '`$help` : Show all available commands.\n\n' +
     '`$balance @user` : Show the current balance of the mentionned user.\n\n' +
     '`$give @user [amount]` : Give the amount specified to the mentionned user.\n\n' +
+    '`$rank money` : Show the 10 richest player on the server.\n\n' +
     '`$admin/$admins` : Show the current admins on this server.\n\n' +
     '`$changelog` : Show latest changelog.');
   }
