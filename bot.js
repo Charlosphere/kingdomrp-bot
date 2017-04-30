@@ -27,9 +27,9 @@ bot.on('message', msg => {
 
   // Help command
    if (msg.content === `${config.trigger}help`) {
-    msg.reply('I\'m here to help! Here are my commands.\n\n' + 
-    '`$help` : Show all available commands.\n\n' + 
-    '`$balance @user` : Show the current balance of the mentionned user.\n\n' + 
+    msg.reply('I\'m here to help! Here are my commands.\n\n' +
+    '`$help` : Show all available commands.\n\n' +
+    '`$balance @user` : Show the current balance of the mentionned user.\n\n' +
     '`$give @user [amount]` : Give the amount specified to the mentionned user.');
   }
 
@@ -66,6 +66,16 @@ bot.on('message', msg => {
         msg.reply(`You currently have ${row.gold} ${emoji.get('dollar')} in your account.`);
       });
     }
+  }
+
+  // Rank gold command
+  if (msg.content.startsWith(`${config.trigger}rank gold`)) {
+    database.rankGold((err, row) => {
+      let response = 'Here are the gold ranking:\n\n';
+      row.map(user => {
+        response += `${user.username} : ${user.gold} golds\n`
+      })
+    });
   }
 
   // #### ADMIN COMMANDS ####

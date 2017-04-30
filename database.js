@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('kingdomrp.db');
- 
+
 exports.init = channels => {
   db.run('CREATE TABLE IF NOT EXISTS user (' +
          'id VARCHAR(45) PRIMARY KEY,' +
@@ -65,4 +65,8 @@ exports.getGold = (id, callback) => {
 
 exports.updateGold = (id, gold) => {
   db.run('UPDATE user SET gold = ? WHERE id = ?;', gold, id);
+};
+
+exports.rankGold = callback => {
+  db.all('SELECT username, gold FROM user ORDER BY gold ASC;', callback);
 };
