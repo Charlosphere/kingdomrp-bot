@@ -3,6 +3,7 @@ const emoji = require('node-emoji');
 const moment = require('moment');
 const database = require('./database');
 const config = require('./config.json');
+const changelog = require('./changelog.json');
 
 const timestamp = () => moment(new Date).format('HH:mm:ss');
 const token = process.env.KINGDOMRP_TOKEN;
@@ -11,6 +12,7 @@ const bot = new Discord.Client();
 bot.on('ready', () => {
   console.log(`${bot.user.username} launched at [${timestamp()}]!`);
   database.init(bot.channels);
+  bot.user.setGame(`v${changelog[0].version} | ${config.trigger}help`);
 });
 
 bot.on('guildCreate', guild => {
@@ -31,7 +33,8 @@ bot.on('message', msg => {
     '`$help` : Show all available commands.\n\n' +
     '`$balance @user` : Show the current balance of the mentionned user.\n\n' +
     '`$give @user [amount]` : Give the amount specified to the mentionned user.\n\n' +
-    '`$admin/$admins` : Show the current admins on this server.');
+    '`$admin/$admins` : Show the current admins on this server.\n\n' +
+    '`$changelog` : Show latest changelog.');
   }
 
     // Show admins command
@@ -43,6 +46,11 @@ bot.on('message', msg => {
       });
       msg.reply(response);
     });
+  }
+
+  // Changelog command
+   if (msg.content === `${config.trigger}changelog`) {
+    msg.reply(changelog[0].content);
   }
 
   // Give gold command
