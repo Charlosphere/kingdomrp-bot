@@ -72,5 +72,5 @@ exports.updateGold = (id, gold) => {
 };
 
 exports.rankGold = callback => {
-  db.all('SELECT username, gold FROM user ORDER BY gold ASC LIMIT 10;', callback);
+  db.all('SELECT username, gold FROM user ORDER BY gold DESC LIMIT 10;', callback);
 };
