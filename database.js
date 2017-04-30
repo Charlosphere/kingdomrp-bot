@@ -47,7 +47,7 @@ exports.addAllUsers = channels => {
   })
 };
 
-exports.removeUser = (id) => {
+exports.removeUser = id => {
   db.run('DELETE FROM user WHERE id = ?;', id);
 };
 
@@ -61,6 +61,10 @@ exports.getPromotion = (id, callback) => {
 
 exports.getGold = (id, callback) => {
   db.get('SELECT gold FROM user WHERE id = ?;', id, callback);
+};
+
+exports.getAdmins = callback => {
+  db.all('SELECT username FROM user WHERE admin = 1;', callback);
 };
 
 exports.updateGold = (id, gold) => {
