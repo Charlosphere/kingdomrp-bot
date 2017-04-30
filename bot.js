@@ -92,7 +92,7 @@ bot.on('message', msg => {
   }
 
   // Rank gold command
-  if (msg.content.startsWith(`${config.trigger}rank gold`)) {
+  else if (msg.content.startsWith(`${config.trigger}rank gold`)) {
     database.rankGold((err, row) => {
       let response = 'Here are the gold ranking:\n\n';
       row.map(user => {
