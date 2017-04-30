@@ -1,0 +1,7 @@
+[
+  {
+    "version": "1.0",
+    "name": "Economy update",
+    "content": "Here's the latest changelog:\n\n**Version 1.0 - Economy Update**\n- First version of this bot!\n- Bot registers every user on the server it joins\n- Every new user joining the server will get automatically registered\n- Every user has a profile in a SQLite database\n- `$help`, `$give`, `$balance`, `$admins`, `$changelog` commands for everyone\n- `$sugive`, `$reset` commands for admins\n- `$promote`, `$demote` for super admins\n"
+  }
+]
