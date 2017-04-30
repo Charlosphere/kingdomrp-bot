@@ -23,6 +23,18 @@ bot.on('guildMemberAdd', member => {
   database.addUser(member.user.id, member.user.username);
 });
 
+bot.setInterval(() => {
+  bot.guilds.map(guild => {
+    guild.members.map(member => {
+      if (!member.user.bot) {
+        database.getGold(member.user.id, (err, row) => {
+          database.updateGold(member.user.id, row.gold + 1);
+        });
+      }
+    });
+  });
+}, 600000);
+
 bot.on('message', msg => {
 
   // #### PUBLIC COMMANDS ####
