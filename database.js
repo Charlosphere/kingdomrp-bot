@@ -63,6 +63,10 @@ exports.getGold = (id, callback) => {
   db.get('SELECT gold FROM user WHERE id = ?;', id, callback);
 };
 
+exports.getAdmins = callback => {
+  db.all('SELECT username FROM user WHERE admin = 1;', callback);
+};
+
 exports.updateGold = (id, gold) => {
   db.run('UPDATE user SET gold = ? WHERE id = ?;', gold, id);
 };

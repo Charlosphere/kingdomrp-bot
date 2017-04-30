@@ -27,10 +27,22 @@ bot.on('message', msg => {
 
   // Help command
    if (msg.content === `${config.trigger}help`) {
-    msg.reply('I\'m here to help! Here are my commands.\n\n' + 
+    msg.reply('I\'m here to help! Here are my commands:\n\n' + 
     '`$help` : Show all available commands.\n\n' + 
     '`$balance @user` : Show the current balance of the mentionned user.\n\n' + 
-    '`$give @user [amount]` : Give the amount specified to the mentionned user.');
+    '`$give @user [amount]` : Give the amount specified to the mentionned user.\n\n' +
+    '`$admin/$admins` : Show the current admins on this server.');
+  }
+
+    // Show admins command
+  else if (msg.content === `${config.trigger}admin` || msg.content === `${config.trigger}admins`) {
+    database.getAdmins((err, row) => {
+      let response = 'Here are the admins on this server:\n\n';
+      row.map(admin => {
+        response += `${admin.username}\n`;
+      });
+      msg.reply(response);
+    });
   }
 
   // Give gold command
@@ -66,7 +78,7 @@ bot.on('message', msg => {
   }
 
   // Show gold command
-  if (msg.content.startsWith(`${config.trigger}balance`)) {
+  else if (msg.content.startsWith(`${config.trigger}balance`)) {
     if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
       database.getGold(msg.mentions.users.first().id, (err, row) => {
         msg.reply(`${msg.mentions.users.first().username} has ${row.gold} ${emoji.get('dollar')} in his account.`);
