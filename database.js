@@ -71,6 +71,10 @@ exports.updateGold = (id, gold) => {
   db.run('UPDATE user SET gold = ? WHERE id = ?;', gold, id);
 };
 
-exports.rankGold = callback => {
+exports.rankGoldTopTen = callback => {
   db.all('SELECT username, gold FROM user ORDER BY gold DESC LIMIT 10;', callback);
+};
+
+exports.rankGoldAll = callback => {
+  db.all('SELECT id, gold FROM user ORDER BY gold DESC;', callback);
 };

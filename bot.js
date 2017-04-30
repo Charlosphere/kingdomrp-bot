@@ -4,6 +4,7 @@ const moment = require('moment');
 const database = require('./database');
 const config = require('./config.json');
 const changelog = require('./changelog.json');
+const utils = require('./utils');
 
 const timestamp = () => moment(new Date).format('HH:mm:ss');
 const token = process.env.KINGDOMRP_TOKEN;
@@ -102,22 +103,40 @@ bot.on('message', msg => {
   else if (msg.content.startsWith(`${config.trigger}balance`)) {
     if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
       database.getGold(msg.mentions.users.first().id, (err, row) => {
-        msg.reply(`${msg.mentions.users.first().username} has ${row.gold} ${emoji.get('dollar')} in his account.`);
+        let response = `${msg.mentions.users.first().username} has ${row.gold} ${emoji.get('dollar')} in his account. `;
+        database.rankGoldAll((err, row) => {
+          for (let i = 0; i < row.length; i++) {
+            if (row[i].id === msg.mentions.users.first().id) {
+              response += `His rank on this server is \`${utils.formatPosition(i + 1)}\`.`;
+              break;
+            }
+          }
+          msg.reply(response);
+        });
       });
     }
     else {
       database.getGold(msg.author.id, (err, row) => {
-        msg.reply(`You currently have ${row.gold} ${emoji.get('dollar')} in your account.`);
+        let response = `You currently have ${row.gold} ${emoji.get('dollar')} in your account. `;
+        database.rankGoldAll((err, row) => {
+          for (let i = 0; i < row.length; i++) {
+            if (row[i].id === msg.author.id) {
+              response += `Your rank on this server is \`${utils.formatPosition(i + 1)}\`.`;
+              break;
+            }
+          }
+          msg.reply(response);
+        });
       });
     }
   }
 
   // Rank gold command
   else if (msg.content === `${config.trigger}rank money`) {
-    database.rankGold((err, row) => {
-      let response = `Here is the ${emoji.get('dollar')} ranking:\n\n`;
-      row.map(user => {
-        response += `${user.username} : ${user.gold} ${emoji.get('dollar')}\n`;
+    database.rankGoldTopTen((err, row) => {
+      let response = `Here are the 10 richest player on this server:\n\n`;
+      row.map((user, i) => {
+        response += `${i + 1}. ${user.username} : ${user.gold} ${emoji.get('dollar')}\n`;
       });
       msg.reply(response);
     });
