@@ -112,7 +112,7 @@ bot.on('message', msg => {
   }
 
   // Rank gold command
-  else if (msg.content === `${config.trigger}rank money`)) {
+  else if (msg.content === `${config.trigger}rank money`) {
     database.rankGold((err, row) => {
       let response = `Here is the ${emoji.get('dollar')} ranking:\n\n`;
       row.map(user => {
