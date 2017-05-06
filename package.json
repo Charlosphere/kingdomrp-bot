@@ -17,8 +17,7 @@
   },
   "homepage": "https://github.com/dumontv/kingdomrp-bot#readme",
   "dependencies": {
-    "discord.js": "^11.0.0",
-    "moment": "^2.18.1",
+    "discord.js": "^11.1.0",
     "node-emoji": "^1.5.1",
     "sqlite3": "^3.1.8"
   }
