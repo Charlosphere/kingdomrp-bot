@@ -69,15 +69,14 @@ bot.on('message', msg => {
 
   // Give gold command
   else if (msg.content.startsWith(`${config.trigger}give`)) {
-
     if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
-
       if (msg.mentions.users.first().id !== msg.author.id) {
-
-        let match = /\s\d+/.exec(msg.content); // regex: contains a number with whitespace before
+        let match = /\s(all)|(\d+)/.exec(msg.content);
         if (match !== null) {
-
           database.getGold(msg.author.id, (err, row) => {
+            if (match[0] === ' all') {
+              match[0] = row.gold;
+            }
             if (row.gold >= parseInt(match[0])) {
               database.updateGold(msg.author.id, row.gold - parseInt(match[0]));
               database.getGold(msg.mentions.users.first().id, (err, row) => {
@@ -85,14 +84,12 @@ bot.on('message', msg => {
                 msg.reply(`You transferred ${parseInt(match[0])} ${emoji.get('dollar')} to ${msg.mentions.users.first().username} from your account.`);
               });
             }
-
             else {
               msg.reply(`You don\'t have enough ${emoji.get('dollar')} for this transaction.`);
             }
           });
         }
       }
-
       else {
         msg.reply('This is not how things work, unfortunately...');
       }
@@ -142,12 +139,43 @@ bot.on('message', msg => {
     });
   }
 
+  // Gamble command
+  else if (msg.content.startsWith(`${config.trigger}gamble`)) {
+    let match = /\s(all)|(\d+)/.exec(msg.content);
+    if (match !== null) {
+      database.getGold(msg.author.id, (err, row) => {
+        if (match[0] === ' all') {
+          match[0] = row.gold;
+        }
+        if (row.gold >= parseInt(match[0])) {
+          const roll = utils.roll(100);
+          let response = `You gambled ${parseInt(match[0])} ${emoji.get('dollar')} and ` +
+          `rolled \`${roll}/100\`. ${emoji.get('game_die')} `;
+          if (roll > 50) {
+            database.updateGold(msg.author.id, row.gold + parseInt(match[0]));
+            response += `You won your bet! ${emoji.get('tada')} ` +
+            `Your balance is now at ${row.gold + parseInt(match[0])} ${emoji.get('dollar')}.`;
+          }
+          else {
+            database.updateGold(msg.author.id, row.gold - parseInt(match[0]));
+            response += `You lost your bet... ${emoji.get('pensive')} ` +
+            `Your balance is now at ${row.gold - parseInt(match[0])} ${emoji.get('dollar')}.`;
+          }
+          msg.reply(response);
+        }
+        else {
+          msg.reply(`You don\'t have enough ${emoji.get('dollar')} for this gamble.`);
+        }
+      });
+    }
+  }
+
   // #### ADMIN COMMANDS ####
 
   // Super-user give: magically give gold to any player
   else if (msg.content.startsWith(`${config.trigger}sugive`)) {
     if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
-      let match = /\s\d+/.exec(msg.content); // regex: contains a number with whitespace before
+      let match = /\s\d+/.exec(msg.content);
       if (match !== null) {
         database.getPromotion(msg.author.id, (err, row) => {
           if (row.admin === 1 || row.suadmin === 1) {

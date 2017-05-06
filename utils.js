@@ -11,3 +11,7 @@ exports.formatPosition = number => {
       return strNumber += 'th';
   }
 }
+
+exports.roll = max => {
+  return Math.floor(Math.random() * max) + 1;
+}
