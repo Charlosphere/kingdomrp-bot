@@ -81,7 +81,8 @@ bot.on('message', msg => {
               database.updateGold(msg.author.id, row.gold - parseInt(match[0]));
               database.getGold(msg.mentions.users.first().id, (err, row) => {
                 database.updateGold(msg.mentions.users.first().id, row.gold + parseInt(match[0]));
-                msg.reply(`You transferred ${parseInt(match[0])} ${emoji.get('dollar')} to ${msg.mentions.users.first().username} from your account.`);
+                msg.reply(`You transferred ${parseInt(match[0])} ${emoji.get('dollar')} ` +
+                `to ${msg.mentions.users.first().username} from your account.`);
               });
             }
             else {
@@ -170,6 +171,38 @@ bot.on('message', msg => {
     }
   }
 
+  // Super gamble command
+  else if (msg.content.startsWith(`${config.trigger}super gamble`) || 
+           msg.content.startsWith(`${config.trigger}sgamble`)) {
+    let match = /\s(all)|(\d+)/.exec(msg.content);
+    if (match !== null) {
+      database.getGold(msg.author.id, (err, row) => {
+        if (match[0] === ' all') {
+          match[0] = row.gold;
+        }
+        if (row.gold >= parseInt(match[0])) {
+          const roll = utils.roll(100);
+          let response = `You super-gambled ${parseInt(match[0])} ${emoji.get('dollar')} and ` +
+          `rolled \`${roll}/100\`. ${emoji.get('game_die')} `;
+          if (roll > 90) {
+            database.updateGold(msg.author.id, row.gold + (parseInt(match[0]) * 10));
+            response += `You won your bet! ${emoji.get('tada')} ` +
+            `Your balance is now at ${row.gold + (parseInt(match[0]) * 10)} ${emoji.get('dollar')}.`;
+          }
+          else {
+            database.updateGold(msg.author.id, row.gold - parseInt(match[0]));
+            response += `You lost your bet... ${emoji.get('pensive')} ` +
+            `Your balance is now at ${row.gold - parseInt(match[0])} ${emoji.get('dollar')}.`;
+          }
+          msg.reply(response);
+        }
+        else {
+          msg.reply(`You don\'t have enough ${emoji.get('dollar')} for this gamble.`);
+        }
+      });
+    }
+  }
+
   // #### ADMIN COMMANDS ####
 
   // Super-user give: magically give gold to any player
@@ -181,7 +214,8 @@ bot.on('message', msg => {
           if (row.admin === 1 || row.suadmin === 1) {
             database.getGold(msg.mentions.users.first().id, (err, row) => {
               database.updateGold(msg.mentions.users.first().id, row.gold + parseInt(match[0]));
-              msg.reply(`You magically transferred ${parseInt(match[0])} ${emoji.get('dollar')} to ${msg.mentions.users.first().username}.`);
+              msg.reply(`You magically transferred ${parseInt(match[0])} ${emoji.get('dollar')} ` + 
+              `to ${msg.mentions.users.first().username}.`);
             });
           }
         });
