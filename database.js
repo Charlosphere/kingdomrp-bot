@@ -1,10 +1,13 @@
 const sqlite3 = require('sqlite3').verbose();
+const db = {};
 
 exports.init = guilds => {
   guilds.map((guild) => {
-    const db = new sqlite3.Database(`${guild.id}.db`);
+    if (!(guild.id in db)) {
+      db[guild.id] = new sqlite3.Database(`${guild.id}.db`);
+    }
 
-    db.run('CREATE TABLE IF NOT EXISTS user (' +
+    db[guild.id].run('CREATE TABLE IF NOT EXISTS user (' +
           'id VARCHAR(45) PRIMARY KEY,' +
           'username VARCHAR(45) NOT NULL,' +
           'gold INTEGER NOT NULL,' +
@@ -13,7 +16,7 @@ exports.init = guilds => {
             this.addAllUsers(guild);
           });
 
-    db.run('CREATE TABLE IF NOT EXISTS item (' +
+    db[guild.id].run('CREATE TABLE IF NOT EXISTS item (' +
           'id INTEGER PRIMARY KEY AUTOINCREMENT,' +
           'name VARCHAR(45) NOT NULL,' +
           'description VARCHAR(150) NOT NULL,' +
@@ -25,25 +28,19 @@ exports.init = guilds => {
           'target INTEGER NOT NULL,' +
           'from_jail INTEGER NOT NULL);');
 
-    db.run('CREATE TABLE IF NOT EXISTS inventory (' +
+    db[guild.id].run('CREATE TABLE IF NOT EXISTS inventory (' +
           'id INTEGER PRIMARY KEY AUTOINCREMENT,' +
           'user_id VARCHAR(45) REFERENCES user(id), ' +
           'item_id INTEGER REFERENCES item(id));');
-
-    db.close();
   });
 };
 
 exports.addUser = (guild, id, username) => {
-  const db = new sqlite3.Database(`${guild.id}.db`);
-
-  db.run('INSERT INTO user (' +
+  db[guild.id].run('INSERT INTO user (' +
          'id, username, gold, admin, suadmin) VALUES (' +
          '?, ?, 0, 0, 0);', id, username, () => {
           /* error handling */
         });
-
-  db.close();
 };
 
 exports.addAllUsers = guild => {
@@ -57,49 +54,33 @@ exports.addAllUsers = guild => {
 };
 
 exports.removeUser = (guild, id) => {
-  const db = new sqlite3.Database(`${guild.id}.db`);
-  db.run('DELETE FROM user WHERE id = ?;', id);
-  db.close();
+  db[guild.id].run('DELETE FROM user WHERE id = ?;', id);
 };
 
 exports.promoteUser = (guild, id, value) => {
-  const db = new sqlite3.Database(`${guild.id}.db`);
-  db.run('UPDATE user SET admin = ? WHERE id = ?;', value, id);
-  db.close();
+  db[guild.id].run('UPDATE user SET admin = ? WHERE id = ?;', value, id);
 };
 
 exports.getPromotion = (guild, id, callback) => {
-  const db = new sqlite3.Database(`${guild.id}.db`);
-  db.get('SELECT admin, suadmin FROM user WHERE id = ?;', id, callback);
-  db.close();
+  db[guild.id].get('SELECT admin, suadmin FROM user WHERE id = ?;', id, callback);
 };
 
 exports.getGold = (guild, id, callback) => {
-  const db = new sqlite3.Database(`${guild.id}.db`);
-  db.get('SELECT gold FROM user WHERE id = ?;', id, callback);
-  db.close();
+  db[guild.id].get('SELECT gold FROM user WHERE id = ?;', id, callback);
 };
 
 exports.getAdmins = (guild, callback) => {
-  const db = new sqlite3.Database(`${guild.id}.db`);
-  db.all('SELECT username FROM user WHERE admin = 1;', callback);
-  db.close();
+  db[guild.id].all('SELECT username FROM user WHERE admin = 1;', callback);
 };
 
 exports.updateGold = (guild, id, gold) => {
-  const db = new sqlite3.Database(`${guild.id}.db`);
-  db.run('UPDATE user SET gold = ? WHERE id = ?;', gold, id);
-  db.close();
+  db[guild.id].run('UPDATE user SET gold = ? WHERE id = ?;', gold, id);
 };
 
 exports.rankGoldTopTen = (guild, callback) => {
-  const db = new sqlite3.Database(`${guild.id}.db`);
-  db.all('SELECT username, gold FROM user ORDER BY gold DESC LIMIT 10;', callback);
-  db.close();
+  db[guild.id].all('SELECT username, gold FROM user ORDER BY gold DESC LIMIT 10;', callback);
 };
 
 exports.rankGoldAll = (guild, callback) => {
-  const db = new sqlite3.Database(`${guild.id}.db`);
-  db.all('SELECT id, gold FROM user ORDER BY gold DESC;', callback);
-  db.close();
+  db[guild.id].all('SELECT id, gold FROM user ORDER BY gold DESC;', callback);
 };

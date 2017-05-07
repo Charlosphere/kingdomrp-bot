@@ -32,7 +32,7 @@ bot.setInterval(() => {
       }
     });
   });
-}, 600000);
+}, 600000); // 10 minutes
 
 bot.on('message', msg => {
 
