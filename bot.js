@@ -22,6 +22,7 @@ bot.on('guildMemberAdd', member => {
   database.addUser(member.guild, member.user.id, member.user.username);
 });
 
+// Gold gain algorithm
 bot.setInterval(() => {
   bot.guilds.map(guild => {
     guild.members.map(member => {
@@ -32,7 +33,7 @@ bot.setInterval(() => {
       }
     });
   });
-}, 600000); // 10 minutes
+}, utils.goldInterval);
 
 bot.on('message', msg => {
 
@@ -198,6 +199,58 @@ bot.on('message', msg => {
         }
         else {
           msg.reply(`You don\'t have enough ${emoji.get('dollar')} for this gamble.`);
+        }
+      });
+    }
+  }
+
+  // Kill command
+  else if (msg.content.startsWith(`${config.trigger}kill`)) {
+    if (msg.mentions.users.first() !== undefined && !msg.mentions.users.first().bot) {
+      database.getAssassinationAttempt(msg.guild, msg.author.id, (err, row) => {
+        if (row.assassination_attempt === 0) {
+          database.getDead(msg.guild, msg.author.id, (err, row) => {
+            if (row.dead === 0) {
+              database.getDead(msg.guild, msg.mentions.users.first().id, (err, row) => {
+                if (row.dead === 0) {
+                  database.updateAssassinationAttempt(msg.guild, msg.author.id, 1, () => {
+                    bot.setTimeout(() => {
+                      database.updateAssassinationAttempt(msg.guild, msg.author.id, 0);
+                      msg.reply(`Your daily assassination attempt has refreshed! ${emoji.get('knife')}`);
+                    }, config.assassinationAttemptCooldown)
+                  });
+
+                  const roll = utils.roll(10);
+                  let response = `You try to assassinate ${msg.mentions.users.first().username}! ${emoji.get('knife')} ` +
+                  `You rolled \`${roll}/10\`. ${emoji.get('game_die')} `;
+                  if (roll >= 8) {
+                    database.updateDead(msg.guild, msg.mentions.users.first().id, 1, () => {
+                       bot.setTimeout(() => {
+                         database.updateDead(msg.guild, msg.author.id, 0);
+                         msg.channel.send(`${msg.mentions.users.first()}, You just came back from the dead! ${emoji.get('baby')}`);
+                       }, config.deathDuration)
+                    });
+                    response += `Your attempt is successful! ${emoji.get('scream')}`;
+                    msg.reply(response);
+                    msg.channel.send(`${msg.mentions.users.first()}, You were murdered by ${msg.author.username}! ${emoji.get('skull')}`);
+                  }
+                  else {
+                    response += `Your attempt failed... ${emoji.get('rotating_light')} Better get running!`;
+                    msg.reply(response);
+                  }
+                }
+                else {
+                  msg.reply(`${msg.mentions.users.first().username} is already dead! ${emoji.get('skull')}`);
+                }
+              });
+            }
+            else {
+              msg.reply(`You cannot kill someone if you're dead. ${emoji.get('skull')}`);
+            }
+          });
+        }
+        else {
+          msg.reply(`You already have attempted an assassination today. ${emoji.get('clock10')}`);
         }
       });
     }

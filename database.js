@@ -11,6 +11,8 @@ exports.init = guilds => {
           'id VARCHAR(45) PRIMARY KEY,' +
           'username VARCHAR(45) NOT NULL,' +
           'gold INTEGER NOT NULL,' +
+          'dead INTEGER NOT NULL,' +
+          'assassination_attempt INTEGER NOT NULL,' +
           'admin INTEGER NOT NULL,' +
           'suadmin INTEGER NOT NULL);', () => {
             this.addAllUsers(guild);
@@ -37,8 +39,8 @@ exports.init = guilds => {
 
 exports.addUser = (guild, id, username) => {
   db[guild.id].run('INSERT INTO user (' +
-         'id, username, gold, admin, suadmin) VALUES (' +
-         '?, ?, 0, 0, 0);', id, username, () => {
+         'id, username, gold, dead, assassination_attempt, admin, suadmin) VALUES (' +
+         '?, ?, 0, 0, 0, 0, 0);', id, username, () => {
           /* error handling */
         });
 };
@@ -75,6 +77,22 @@ exports.getAdmins = (guild, callback) => {
 
 exports.updateGold = (guild, id, gold) => {
   db[guild.id].run('UPDATE user SET gold = ? WHERE id = ?;', gold, id);
+};
+
+exports.getDead = (guild, id, callback) => {
+  db[guild.id].get('SELECT dead FROM user WHERE id = ?;', id, callback);
+};
+
+exports.updateDead = (guild, id, dead, callback) => {
+  db[guild.id].run('UPDATE user SET dead = ? WHERE id = ?;', dead, id, callback);
+};
+
+exports.getAssassinationAttempt = (guild, id, callback) => {
+  db[guild.id].get('SELECT assassination_attempt FROM user WHERE id = ?;', id, callback);
+};
+
+exports.updateAssassinationAttempt = (guild, id, attempt, callback) => {
+  db[guild.id].run('UPDATE user SET assassination_attempt = ? WHERE id = ?;', attempt, id, callback);
 };
 
 exports.rankGoldTopTen = (guild, callback) => {

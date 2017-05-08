@@ -1,3 +1,6 @@
 {
-  "trigger" : "$"
+  "trigger": "$",
+  "goldInterval": 600000,
+  "deathDuration": 6.048e+8,
+  "assassinationAttemptCooldown":  8.64e+7
 }
