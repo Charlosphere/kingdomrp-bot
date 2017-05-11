@@ -77,7 +77,7 @@ bot.on('message', msg => {
             if (match[0] === ' all') {
               match[0] = row.gold;
             }
-            if (match[0] === 0) {
+            if (parseInt(match[0]) === 0) {
               msg.reply(`What would be the point in doing that? ${emoji.get('thinking')}`)
             }
             else if (row.gold >= parseInt(match[0])) {
@@ -151,7 +151,7 @@ bot.on('message', msg => {
         if (match[0] === ' all') {
           match[0] = row.gold;
         }
-        if (match[0] === 0) {
+        if (parseInt(match[0]) === 0) {
           msg.reply(`You can't gamble out of thin air... ${emoji.get('thinking')}`)
         }
         else if (row.gold >= parseInt(match[0])) {
@@ -186,7 +186,7 @@ bot.on('message', msg => {
         if (match[0] === ' all') {
           match[0] = row.gold;
         }
-        if (match[0] === 0) {
+        if (parseInt(match[0]) === 0) {
           msg.reply(`You can't super-gamble out of thin air... ${emoji.get('thinking')}`)
         }
         else if (row.gold >= parseInt(match[0])) {
