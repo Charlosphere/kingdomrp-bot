@@ -1,5 +1,9 @@
 exports.formatPosition = number => {
   let strNumber = number.toString();
+  switch (strNumber.slice(-2)) {
+    case '11': case '12': case '13':
+      return strNumber += 'th';
+  }
   switch (strNumber.slice(-1)) {
     case '1':
       return strNumber += 'st';
