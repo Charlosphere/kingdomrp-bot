@@ -186,7 +186,7 @@ bot.on('message', msg => {
           `rolled \`${roll}/100\`. ${emoji.get('game_die')} `;
           if (roll > 90) {
             database.updateGold(msg.guild, msg.author.id, row.gold + (parseInt(match[0]) * 10));
-            response += `You won your bet! ${emoji.get('tada')} ` +
+            response += `You won 10 times your bet! ${emoji.get('tada')} ` +
             `Your balance is now at ${row.gold + (parseInt(match[0]) * 10)} ${emoji.get('dollar')}.`;
           }
           else {
