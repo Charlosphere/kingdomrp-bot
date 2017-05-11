@@ -77,7 +77,10 @@ bot.on('message', msg => {
             if (match[0] === ' all') {
               match[0] = row.gold;
             }
-            if (row.gold >= parseInt(match[0])) {
+            if (match[0] === 0) {
+              msg.reply(`What would be the point in doing that? ${emoji.get('thinking')}`)
+            }
+            else if (row.gold >= parseInt(match[0])) {
               database.updateGold(msg.guild, msg.author.id, row.gold - parseInt(match[0]));
               database.getGold(msg.guild, msg.mentions.users.first().id, (err, row) => {
                 database.updateGold(msg.guild, msg.mentions.users.first().id, row.gold + parseInt(match[0]));
@@ -148,7 +151,10 @@ bot.on('message', msg => {
         if (match[0] === ' all') {
           match[0] = row.gold;
         }
-        if (row.gold >= parseInt(match[0])) {
+        if (match[0] === 0) {
+          msg.reply(`You can't gamble out of thin air... ${emoji.get('thinking')}`)
+        }
+        else if (row.gold >= parseInt(match[0])) {
           const roll = utils.roll(100);
           let response = `You gambled ${parseInt(match[0])} ${emoji.get('dollar')} and ` +
           `rolled \`${roll}/100\`. ${emoji.get('game_die')} `;
@@ -180,7 +186,10 @@ bot.on('message', msg => {
         if (match[0] === ' all') {
           match[0] = row.gold;
         }
-        if (row.gold >= parseInt(match[0])) {
+        if (match[0] === 0) {
+          msg.reply(`You can't super-gamble out of thin air... ${emoji.get('thinking')}`)
+        }
+        else if (row.gold >= parseInt(match[0])) {
           const roll = utils.roll(100);
           let response = `You super-gambled ${parseInt(match[0])} ${emoji.get('dollar')} and ` +
           `rolled \`${roll}/100\`. ${emoji.get('game_die')} `;
